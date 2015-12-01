@@ -1,0 +1,158 @@
+body {
+  font: 10px sans-serif;
+  margin: 0;
+}
+
+
+svg .xaxis{
+	font-size: 10px;
+	font-family: sans-serif;
+	text-rendering: optimizeLegibility;
+	margin-left: 10px;
+}
+
+
+svg .xaxis line,.xaxis path{
+	fill: none;
+	stroke: #000;
+	stroke-width: 2px;
+}
+
+svg .xaxis text{
+	transform: rotate(90);
+	text-anchor: start;
+
+
+}
+#results{
+	overflow-y: scroll;
+
+	position: absolute;
+	width: 75%;	
+	height: 60%;
+	background: #eee;
+	left: 25%;
+}
+
+#results svg{
+	background-color: #fff;
+	margin-left: 10px;
+	margin-bottom: 5px;
+	
+}
+
+#results path:hover{
+	stroke-width: 2.5px;
+	stroke: #ff0000;
+}
+
+
+
+#multiples{
+	position: absolute;
+	width: 25%;
+	bottom: 0;
+	height: 100%;
+	overflow-y:scroll;
+	float: left;
+}
+
+#multiples svg{
+	background-color: #eee;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	
+}
+
+#multiples .line {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+
+#multiples .lowline {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.5px;
+}
+
+#multiples .highline {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.5px;
+}
+
+
+
+
+
+
+#search{
+
+	background: #eee;
+	position: absolute;
+	top: 60%;
+	left: 25%;
+	width: 75%;
+	height: 20%;
+	-webkit-touch-callout: none;
+   	-webkit-user-select: none;
+    	-khtml-user-select: none;
+    	-moz-user-select: none;
+    	-ms-user-select: none;
+    	user-select: none;
+	
+}
+
+#search svg{
+	margin-left: 10px;
+}
+#search canvas{
+	background: #fff;
+	margin-left: 10px;
+	margin-right: 10px;
+
+}
+
+#searchUI{
+	background: #eee;
+	position: absolute;
+	top: 80%;
+	left: 25%;
+	width: 75%;
+	height: 10%;
+  -webkit-user-select: none;
+}
+
+#searchOption{
+	background: #eee;
+	position: absolute;
+	top: 90%;
+	left: 25%;
+	width: 75%;
+	height: 10%;
+  -webkit-user-select: none;
+}
+
+#searchUI button{
+	margin-top: 10px;
+	margin-left: 10px;
+	height: 80%;
+	width: 10%;
+}
+#searchUI button img{
+
+	height: 80%;
+}
+
+.searchTable{
+	margin-left:10px
+}
+.searchTable th,td{
+	border-collapse: collapse;
+	border: 1px solid buttonface;
+}
