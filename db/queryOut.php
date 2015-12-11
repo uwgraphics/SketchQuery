@@ -7,7 +7,7 @@
 //Can talk to either a database or a file. If the former, set fileMode to false, and change the variables in db.php to your mysql configuration.
  
 include_once("db.php");
-
+date_default_timezone_set(UTC);
 $date = date('Y-m-d H:i',time());
 $query = $_POST['query'];
 $mode = $_POST['mode'];
