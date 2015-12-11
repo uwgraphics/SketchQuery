@@ -560,7 +560,7 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 	$.ajax
 	({
 		type: "POST",
-		url: 'queryOut.php',
+		url: 'db/queryOut.php',
 		data: 'query='+sendData.query+"&comments="+sendData.comments+"&mode="+sendData.mode+"&dataset="+sendData.dataset+"&notes="+sendData.notes, 
 		cache: false,
 		success: function(){
