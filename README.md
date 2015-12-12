@@ -38,14 +38,16 @@ The bottom middle region is the “sketch pane,” containing the sketch canvas 
 
 B. Loading DataSets
 -------------------
-	Datasets are assumed to be csv files in the datasets directory in the main SketchQuery folder. The csvs should have a header line, and needs a minimum of three specific columns (in any order; extraneous columns will be ignored).
-	A NAME column: The name of a particular time series.
-	A TIME column: The temporal location of an observation
-	A VALUE column: The value of the time series at this time point.
+
+Datasets are assumed to be csv files in the datasets directory in the main SketchQuery folder. The csvs should have a header line, and needs a minimum of three specific columns (in any order; extraneous columns will be ignored).
+* A NAME column: The name of a particular time series.
+* A TIME column: The temporal location of an observation
+* A VALUE column: The value of the time series at this time point.
+
 There should be one row per time series, per time point.
 An example, from the Google NGrams dataset:
 	word,year,freq
-	 #,1800,0.00000767
+	#,1800,0.00000767
 
 The NAME, TIME, and VALUE columns can have any name. By default, the prototype assumes they are called “word”, “date”, and “freq.” 
  NAME is presumed to be a string, TIME a d3 parse-able date, and VALUE a floating point number. 
