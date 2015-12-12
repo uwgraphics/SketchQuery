@@ -46,7 +46,9 @@ Datasets are assumed to be csv files in the datasets directory in the main Sketc
 
 There should be one row per time series, per time point.
 An example, from the Google NGrams dataset:
+
 	word,year,freq
+	
 	#,1800,0.00000767
 
 The NAME, TIME, and VALUE columns can have any name. By default, the prototype assumes they are called “word”, “date”, and “freq.” 
