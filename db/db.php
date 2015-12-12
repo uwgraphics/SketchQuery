@@ -1,4 +1,5 @@
 <?php
+$saveQueries = false;
 $fileMode = true;
 $user = "DBUSERNAME";
 $server = "DBSERVER";

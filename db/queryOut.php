@@ -14,27 +14,28 @@ $mode = $_POST['mode'];
 $comments = $_POST['hits'];
 $dataset = $_POST['dataset'];
 
-if($fileMode){
-  file_put_contents("queries.tsv","$date	$query	$mode	$hits	$dataset\n",FILE_APPEND);
-}
-else{
-  $fullquery = "INSERT INTO $dbname VALUES ('$date','$query',$mode,$hits,$dataset);";
-  try{
-	$db = mysql_connect($server,$user,$pass);
-	if(!$db){
-		throw new Exception('Error connecting to mysql');
-	}
-	$result = mysql_query($fullquery);
-	if($result){
-		throw new Exception('Error executing query');
-	}
-	mysql_close($db);
+if($saveQueries){
+  if($fileMode){
+    file_put_contents("queries.tsv","$date	$query	$mode	$hits	$dataset\n",FILE_APPEND);
   }
-  catch(Exception $e){
-	echo mysql_error();
-  } 
+  else{
+    $fullquery = "INSERT INTO $dbname VALUES ('$date','$query',$mode,$hits,$dataset);";
+    try{
+	$db = mysql_connect($server,$user,$pass);
+	  if(!$db){
+            throw new Exception('Error connecting to mysql');
+  	  }
+	  $result = mysql_query($fullquery);
+	  if($result){
+            throw new Exception('Error executing query');
+  	  }
+	  mysql_close($db);
+    }
+    catch(Exception $e){
+  	  echo mysql_error();
+    } 
+  }
 }
-
 echo "Finished";
 ?>
 
