@@ -6,7 +6,7 @@
 <script src="colorbrewer/colorbrewer.js"></script>
 <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="colorbrewer/colorbrewer.css"/>
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
 
 <body onresize="resize()">
@@ -78,16 +78,10 @@ var resultMode = 0;
 var sendData;
 
 //Utility functions
-function gup(name){
-  var pattern = new RegExp( "[\\?&]"+name+"=[^&#]*");
+function gup(vName){
+  var pattern = new RegExp( "[\\?&]"+vName+"=([^&#]*)");
   var results = pattern.exec(location.href);
-  return results == null ? null : results[1];
-}
-
-function getTime(obj){
-  var prop = gup('time');
-  var time = prop ? obj[prop] : obj['date'];
-  return time;
+  return results ? results[1] : null ;
 }
 
 function getFormat(){
@@ -96,23 +90,15 @@ function getFormat(){
   return format; 
 }
 
-
-function getName(obj){
-  var n = gup('name');
-  var name = n ? n : 'word';
-  return obj[name];
+function getNameString(){
+  var name = gup('name');
+  var nString = name ? name : 'word';
+  return nString;
 }
-
 function getTimeString(){
   var time = gup('time');
   var tString = time ? time : 'date';
   return tString;
-}
-
-function getValue(obj){
-  var val = gup('value');
-  var value = val ? obj[val] : obj.freq;
-  return value;
 }
 
 function getValueString(){
@@ -135,27 +121,32 @@ function resize(){
 }
 
 function type(d) {
-  d.value = +getValue(d);
-  d.date = parseDate(d);
+  d[value] = +(d[value]);
+  d[time] = parseD(d[time]);
   return d;
 }
 
 
 //Data loading and initialization
 var datasrc = gup('data');
+var name = getNameString();
+var time = getTimeString();
+var value = getValueString();
+var parseD = function(d){ return +d;};
+if(gup('time')=='date'){
+  parseD = function(d){ return parseDate(d); };
+}
 datasrc = datasrc ? 'datasets/'+datasrc+'.csv' : 'datasets/onemilliontop1k1800.csv';
 d3.csv(datasrc, type, function(error, data) {
- document.body.style.cursor="wait"
- var symbols = d3.nest()
-      .key(function(d) { return getName(d); })
-      .entries(data);
+ document.body.style.cursor="wait";
+  var symbols = d3.nest()
+    .key(function(d) { return d[name]; })
+    .entries(data);
 
   x.domain([
-    d3.min(symbols, function(symbol) { return getTime(symbol.values[0]);}),
-    d3.max(symbols, function(symbol) { return getTime(symbol.values[symbol.values.length - 1]); })
-  ]);
-
- 	
+    d3.min(symbols, function(symbol) { return symbol.values[0][time];}),
+    d3.max(symbols, function(symbol) { return symbol.values[symbol.values.length - 1][time]; })
+  ]);	
   var svg = d3.select("#multiples").selectAll("svg")
       .data(symbols)
     .enter().append("svg")
@@ -169,7 +160,7 @@ d3.csv(datasrc, type, function(error, data) {
       .attr("transform", "translate(" + 0  + "," + margin.top + ")")
       .each(function(symbol,i) {
         symbol.y = d3.scale.linear()
-            .domain([d3.min(symbol.values, function(d){return getValue(d);}),d3.max(symbol.values,function(d){return getValue(d);})])
+            .domain([d3.min(symbol.values, function(d){return d[value];}),d3.max(symbol.values,function(d){return d[value];})])
             .range([height, 0]);
 	symbol.rankOrder = i;
 	symbol.bestX = 0;
@@ -180,8 +171,8 @@ d3.csv(datasrc, type, function(error, data) {
       .attr("class", "area")
       .attr("d", function(symbol) {
         return d3.svg.area()
-            .x(function(d) { return x(getTime(d)); })
-            .y1(function(d) { return symbol.y(getValue(d)); })
+            .x(function(d) { return x(d[time]); })
+            .y1(function(d) { return symbol.y(d[value]); })
             .y0(height)
             (symbol.values);
       });
@@ -190,8 +181,8 @@ d3.csv(datasrc, type, function(error, data) {
       .attr("class", "line")
       .attr("d", function(symbol) {
         return d3.svg.line()
-           .x(function(d) { return x(getTime(d)); })
-           .y(function(d) { return symbol.y(getValue(d)); })
+           .x(function(d) { return x(d[time]); })
+           .y(function(d) { return symbol.y(d[value]); })
             (symbol.values);
       });
 
@@ -219,8 +210,8 @@ d3.csv(datasrc, type, function(error, data) {
 	rX = d3.time.scale();
 	
 	rX.domain([
-    d3.min(symbols, function(symbol) { return getTime(symbol.values[0]);}),
-    d3.max(symbols, function(symbol) { return getTime(symbol.values[symbol.values.length - 1]); })
+    d3.min(symbols, function(symbol) { return symbol.values[0][time];}),
+    d3.max(symbols, function(symbol) { return symbol.values[symbol.values.length - 1][time]; })
   ]);
 	rX.range([0,rwidth]);
 	var xAxis = d3.svg.axis().orient("top").scale(rX).tickSize(10).tickFormat(getFormat()).ticks(20);
@@ -318,6 +309,7 @@ d3.csv(datasrc, type, function(error, data) {
 
 
 function search(){
+        document.body.style.cursor = "wait";
 	queryRange = 0;
 	queryMin = -1;
 	queryMax = -1;
@@ -333,9 +325,6 @@ function search(){
 	//console.log(symbol.key+" query goes from "+queryMin+"-"+queryMax);
 	queryRange = queryMax-queryMin;
 
-
-	//Not actually asynchronous so the spinning wheel is just telling me, the developer, that there was an error in executing the search.
-	$("body").css("cursor","progress");
 	var start = new Date().getTime();
 	if(document.getElementById("queryMode").value==0){
 		d3.select("#multiples").selectAll("svg").each(function(symbol){minDiff(symbol);});
@@ -354,15 +343,14 @@ function search(){
 	hitColorScale.domain([d3.select("#multiples").select("svg:last-child").datum().bestHit,d3.select("#multiples").select("svg").datum().bestHit]);
 	updateColors();
 	result(document.getElementById("n").value);
-	$("body").css("cursor","default");
-	
+	document.body.style.cursor = "default";
 }
 
 function inRangeResults(symbol){
 //Give me just the data values that fell into the window I found with the best match
 	var inRangeValues = new Array();
 	for(var i = 0;i<symbol.values.length;i++){
-		if(rX(getTime(symbol.values[i]))>symbol.bestX - (queryRange/2.0) && rX(getTime(symbol.values[i]))<symbol.bestX+(queryRange/2.0)){
+		if(rX(symbol.values[i][time])>symbol.bestX - (queryRange/2.0) && rX(symbol.values[i][time])<symbol.bestX+(queryRange/2.0)){
 			inRangeValues.push(symbol.values[i]);
 		}
 	}
@@ -401,7 +389,7 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 		
 		results.each(function(symbol,i){
 			curY = d3.scale.linear()
-            			.domain([d3.min(symbol.values, function(d){return getValue(d);}), d3.max(symbol.values, function(d) { return getValue(d); })])
+            			.domain([d3.min(symbol.values, function(d){return d[value];}), d3.max(symbol.values, function(d) { return d[value]; })])
 		        	.range([rheight, 0]);
 			
 			var cindex;
@@ -419,8 +407,8 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 				.attr("title",symbol.key)
 				.attr("d", function(d) {
 		       		return d3.svg.line()
-            			.x(function(d) { return rX(getTime(d)); })
-		       		.y(function(d) { return curY(getValue(d)); })
+            			.x(function(d) { return rX(d[time]); })
+		       		.y(function(d) { return curY(d[value]); })
         			 (symbol.values);
      				 });
 	
@@ -439,10 +427,10 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 						.attr("stroke-width",3)
 						.attr("d", function(d) {
 		       				return d3.svg.line()
-            					.x(function(d) { return rX(getTime(d)); })
+            					.x(function(d) { return rX(d[time]); })
 				       		.y(function(d) { 
 	
-								return curY(getValue(d)); 
+								return curY(d[value]); 
 					
 							})
 	       					 (inRangeResults(symbol));
@@ -458,7 +446,7 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 		results.each(function(symbol){
 	//	console.log(symbol.key+" has a -MSE of "+symbol.bestHit+" over "+symbol.values.length+" points");
 		curY = d3.scale.linear()
-            		.domain([d3.min(symbol.values, function(d){return getValue(d);}), d3.max(symbol.values, function(d) { return getValue(d); })])
+            		.domain([d3.min(symbol.values, function(d){return d[value];}), d3.max(symbol.values, function(d) { return d[value]; })])
 		        .range([rheight, 0]);
 
 		cursvg = d3.select("#results").append("svg")
@@ -471,8 +459,8 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 			.attr("fill","#333")
 			.attr("d", function(d) {
 		       		return d3.svg.area()
-            			.x(function(d) { return rX(getTime(d)); })
-		       		.y1(function(d) { return curY(getValue(d)); })
+            			.x(function(d) { return rX(d[time]); })
+		       		.y1(function(d) { return curY(d[value]); })
 	        		.y0(rheight)
         			 (symbol.values);
      				 });
@@ -492,10 +480,10 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 			.attr("fill",windowColorScale(symbol.bestHit))
 				.attr("d", function(d) {
 		       			return d3.svg.area()
-            				.x(function(d) { return rX(getTime(d)); })
+            				.x(function(d) { return rX(d[time]); })
 			       		.y1(function(d) { 
 
-							return curY(getValue(d)); 
+							return curY(d[value]); 
 				
 					})
 		        		.y0(rheight)
@@ -542,7 +530,7 @@ var results = d3.select("#multiples").selectAll("svg").filter(function(d,i){ ret
 	if(datasetString=="")
 		datasetString="onemilliontop1k1800";
 
-	sendData = {query: queryString, comments: commentString, mode: 0, dataset: datasetString, notes: "CHItesting"};
+	sendData = {query: queryString, comments: commentString, mode: 0, dataset: datasetString, notes: "CHI Testing"};
 
 
 	$.ajax
@@ -695,7 +683,7 @@ function houghTransform(symbol){
 						curVal = smoothed[i];				
 					}
 					else{
-						curVal = getValue(signal[i]);
+						curVal = signal[i][value];
 					}
 					hindex = Math.floor((testX + ((queryRange/2.0)-(j-queryMin)))*voteScale);
 					vindex = Math.floor((((searchCanvas.height/2.0) - query[j]) + rY(symbol.y(curVal))+(voteBuffer*searchCanvas.height))*yVoteScale); 	
@@ -709,7 +697,7 @@ function houghTransform(symbol){
 					}
 					else{
 						if(vindex<0 || vindex>votes[0].length){
-							console.log("("+hindex+","+vindex+") is out of bounds, query[i]="+query[j]+", signal[i]="+rY(symbol.y(getValue(signal[i]))));
+							console.log("("+hindex+","+vindex+") is out of bounds, query[i]="+query[j]+", signal[i]="+rY(symbol.y(signal[i][value])));
 						}
 					}
 				}	
@@ -726,7 +714,7 @@ function houghTransform(symbol){
 
 function DTW(symbol){
 //Dynamic Time Warping
-//There's no way this will be fast enough, and since we will likely have big temporal jumps (for alignment, if that's what the query calls for) then we can't use FastDTW, oh well.
+//There's no way this will be fast enough, and since we will likely have big temporal jumps (for alignment, if that's what the query calls for) then we can't use FastDTW, alas.
 
 	var signal = symbol.values;
 	symbol.bestX = 0;
@@ -762,7 +750,7 @@ function DTW(symbol){
 			curVal = smoothed[i];
 		}
 		else{
-			curVal = getValue(signal[i]);
+			curVal = signal[i][value];
 		}
 		for(var j = 1;j<DTWM[i].length;j++){
 			cost = Math.pow(rY(symbol.y(curVal))-query[j],2);
@@ -814,9 +802,9 @@ function minDiff(symbol){
 				curVal = smoothed[i];
 			}
 			else{
-				curVal = getValue(signal[i]);
+				curVal = signal[i][value];
 			}
-			testX = Math.round(rX(getTime(signal[i])));
+			testX = Math.round(rX(signal[i][time]));
 			queryShift = testX - j;
 			if(isNaN(query[queryShift])){
 			//	console.log("query["+queryShift+"] is undefined");
@@ -1042,10 +1030,10 @@ function drawQuery(symbol){
 	var nextY;
 	var slope;
 	for(var i = 0;i<symbol.values.length-1;i++){
-		curX = Math.floor(rX(getTime(symbol.values[i])));
-		nextX = Math.floor(rX(getTime(symbol.values[i+1])));
-		curY = searchCanvas.height - rY(symbol.y(getValue(symbol.values[i])));
-		nextY = searchCanvas.height- rY(symbol.y(getValue(symbol.values[i+1])));
+		curX = Math.floor(rX(symbol.values[i][time]));
+		nextX = Math.floor(rX(symbol.values[i+1][time]));
+		curY = searchCanvas.height - rY(symbol.y(symbol.values[i][value]));
+		nextY = searchCanvas.height- rY(symbol.y(symbol.values[i+1][value]));
 
 		context.fillStyle = "#333";	
 		context.beginPath();
@@ -1124,12 +1112,12 @@ var smoothed = Array(series.length);
 //need a deep copy, luckily we just need value, not date
 
 	for(var i = 0;i<smoothed.length;i++){
-		smoothed[i] = getValue(series[i]);
+		smoothed[i] = series[i][value];
 	}
 
-	var curAvg = getValue(series[0]);
+	var curAvg = series[0][value];
 	for(var i = 1;i<smoothed.length;i++){
-		curAvg += (getValue(series[i]) - curAvg)/smoothFactor;
+		curAvg += (series[i][value] - curAvg)/smoothFactor;
 		smoothed[i] = curAvg;
 	}
 	return smoothed;
