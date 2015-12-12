@@ -7,19 +7,27 @@ Released under a CRAPL license, see LICENSE file.
 Contact: mcorrell on github, or correll_at_uw.edu
 
 OUTLINE
+#
 	A. Organization
+	
 	B. Loading Datasets
+	
 	C. Drawing UI
+	
 		1. Sketching
 		2. Exemplar Queries
+
 	D. Querying UI
+
 		1. Invariants
 		2. MSE
 		3. Hough
 		4. DTW
-  E. Datasets
+
+	E. Datasets
 
 A. Organization
+---------------
 The prototype is divided into three main areas:
 
 The left hand side is the “small multiples pane,” containing a scrollable list all the time series in the current dataset. After a query is executed, the time series are SORTED by their closeness to your query, and colored by their relative closeness. That is, green series within the top 1/9th closest queries by value of match strength, and red are in the bottom 1/9th closest queries. 
@@ -29,7 +37,8 @@ The top middle region is the “results pane,” showing the top closest results
 The bottom middle region is the “sketch pane,” containing the sketch canvas as well as UI options for drawing and refining queries.
 
 B. Loading DataSets
-	Datasets are assumed to be csv files in the same directory as the main SketchQuery folder. The csvs should have a header line, and needs a minimum of three specific columns (in any order; extraneous columns will be ignored).
+-------------------
+	Datasets are assumed to be csv files in the datasets directory in the main SketchQuery folder. The csvs should have a header line, and needs a minimum of three specific columns (in any order; extraneous columns will be ignored).
 	A NAME column: The name of a particular time series.
 	A TIME column: The temporal location of an observation
 	A VALUE column: The value of the time series at this time point.
@@ -45,6 +54,7 @@ To specify new names or new csvs to the prototype, include them as html get vari
 http://HOST/PATH/main.php?data=stocks2&time=date&value=price&name=symbol
 
 C. Drawing UI
+-------------
 	1. Sketching
 		The central, pure white area of the prototype is the drawing canvas. Hold down the mouse, or stylus, or drag your fingers in a touch display, to interact with the canvas. A red line at the bottom of the canvas indicates there is no data at that location: otherwise, the values are presumed to be zero.
 		In the central pane of the display are four buttons:
@@ -61,6 +71,7 @@ C. Drawing UI
 		Doubleclicking (or doubletapping, in touch displays) on the small multiples pane will transfer a query into the sketch pane, allowing you to use it as a “query by example.” You can draw over this query at will, or erase portions you think are irrelevant. 
 
 D. Querying UI
+--------------
 	1. Invariants
 		The next bottom row of drawing UI controls what matching ALGORITHM to use (see below), and what INVARIANTS should be active. Not every algorithm supports every invariant: by switching algorithms, some checkboxes may be disabled or reset. Please see the paper for more details about invariants. Essentially, invariants are properties of your sketch or of the dataset that you consider irrelevant for calculating matches. 
 
@@ -79,7 +90,10 @@ D. Querying UI
 	4. DTW
 		Dynamic Time Warping (DTW) finds the cheapest non-linear time warp from your sketch to a particular time series. This is very useful if there are characteristic patterns you are looking for, but these patterns may be arbitrarily separated or compressed in time. An example is a crash in stock price: a stock might crash over a matter of hours, or over a matter of days. By drawing a linear decrease, and selecting DTW, all of these crashes could be located. The longer the sketch, the more complicated the warp that must be calculated.
 
-E. We have included a number of default datasets on github pages. Somes ones to try:
+E. Datasets
+-----------
+We have included a number of default datasets on github pages. Somes ones to try:
+
 * [Google n grams](uwgraphics.github.io/SketchQuery) (default): The top 1000 most popular words in the google books corpus, with frequency information from 1800 onward.
 * [Stocks](uwgraphics.github.io/SketchQuery/?data=stocks2&time=date&value=price&name=symbol): Sample stock information for a period of one year, August 2009-2010.
 * [U.S. Government Agencies](http://uwgraphics.github.io/SketchQuery/?data=budget&name=agency&time=year&value=budget): The yearly budget of every agency of the U.S. government, 1976-2020(projected).
