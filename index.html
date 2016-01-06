@@ -662,23 +662,23 @@ function houghTransform(symbol){
   var endSearch = signal.length;
   if(!document.getElementById("XPos").checked){
     var i = 0;
-    testX = rX(getTime(signal[i]));
+    testX = rX(signal[i][time]);
     while(testX<queryMin && i<signal.length-1){
       i++;
-      testX = rX(getTime(signal[i]));
+      testX = rX(signal[i][time]);
     }
     startSearch = i;
     var i = 0;
-    testX = rX(getTime(signal[startSearch]));
+    testX = rX(signal[startSearch][time]);
     while(testX<queryMax && i<signal.length-1){
       i++;
-      testX = rX(getTime(signal[i]));
+      testX = rX(signal[i][time]);
     }
     endSearch = i;
   }
   var curVal;
   for(var i = startSearch;i<endSearch;i++){
-    testX = Math.floor(rX(getTime(signal[i])));
+    testX = Math.floor(rX(signal[i][time]));
       if(isNaN(query[testX])){
         console.log("query["+testX+"] is undefined");  
       }
