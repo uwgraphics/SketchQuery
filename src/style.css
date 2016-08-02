@@ -115,7 +115,7 @@ svg .xaxis text{
 	background: #fff;
 	margin-left: 10px;
 	margin-right: 10px;
-
+  min-height: 100px;
 }
 
 #searchUI{
