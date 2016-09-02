@@ -1,7 +1,9 @@
 # SketchQuery
-Sketch-based queries of time series data
+A information associated with our paper for [VAST 2016](http://ieeevis.org/),  [Semantics of Sketch: A Visual Query System for Time Series Data](http://graphics.cs.wisc.edu/Papers/2016/CG16/).
 
-Allows users to sketch a query on a height field, establish invariants (properties of the sketch or data they find unimportant) and then query a set of time series data.
+Data from our qualitative study is in the [Evaluation](evaluation) folder.
+
+The following information is for our tool, which allows users to sketch a query on a height field, establish invariants (properties of the sketch or data they find unimportant) and then query a set of time series data.
 
 Released under a CRAPL license, see LICENSE file.
 Contact: mcorrell on github, or correll_at_uw.edu
