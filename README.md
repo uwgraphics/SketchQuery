@@ -1,5 +1,5 @@
 # SketchQuery
-A information associated with our paper for [VAST 2016](http://ieeevis.org/),  [Semantics of Sketch: A Visual Query System for Time Series Data](http://graphics.cs.wisc.edu/Papers/2016/CG16/).
+A information associated with our [paper](paper/VAST2016.pdf) for [VAST 2016](http://ieeevis.org/),  [Semantics of Sketch: A Visual Query System for Time Series Data](http://graphics.cs.wisc.edu/Papers/2016/CG16/).
 
 Data from our qualitative study is in the [Evaluation](evaluation) folder.
 
