@@ -74,7 +74,7 @@ function load(){
   }
   datasrc = datasrc ? 'datasets/'+datasrc+'.csv' : 'datasets/onemilliontop1k1800.csv';
   
-  d3.csv(datasrc,function(row){ row[value] = +row[value]; return row;},function(data){ doneLoad(data);});
+  d3.csv(datasrc,function(row){ row[value] = +row[value]; row[time] = parseD(row[time]); return row;},function(data){ doneLoad(data);});
 };
 
 function doneLoad(rawData){
