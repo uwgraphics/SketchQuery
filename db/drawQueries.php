@@ -13,7 +13,7 @@ var x = d3.scale.linear().range([0,250]);
 var y = d3.scale.linear().domain([0,150]).range([50,0]);
 var rows;
 
-d3.tsv("/queries.tsv", function(error, data){
+d3.tsv("./queries.tsv", function(error, data){
 	data.forEach(function(d){
 		d.x = x;
 		d.query = d.query.split(",");
