@@ -17,6 +17,7 @@ var x;
 
 var rectWidth;
 var searchCanvas;
+var cHeight;
 var bounds;
 
 var query;
@@ -79,166 +80,179 @@ function load(){
 
 function doneLoad(rawData){
   var symbols = d3.nest()
-    .key(function(d){ return d[name]; })
-    .entries(rawData);
+  .key(function(d){ return d[name]; })
+  .entries(rawData);
   
-         x.domain([
-                   d3.min(symbols, function(symbol) { return symbol.values[0][time];}),
-                   d3.max(symbols, function(symbol) { return symbol.values[symbol.values.length - 1][time]; })
-                   ]);
-         
-         
-         var svg = d3.select("#multiples").selectAll("svg")
-         .data(symbols)
-         .enter().append("svg")
-         .attr("width", width)
-         .attr("height", height + margin.top + margin.bottom)
-         .attr("id",function(symbol){ return "key"+symbol.key;})
-         .attr("ondblclick","transferQuery(event)")
-         .attr("ontouchstart","touchInit(event)")
-         .attr("ontouchend","touchTransfer(event)")
-         .append("g")
-         .attr("transform", "translate(" + 0  + "," + margin.top + ")")
-         .each(function(symbol,i) {
-               
-               symbol.y = d3.scale.linear()
-               .domain(d3.extent(symbol.values,function(d){return d[value];}))
-               .range([height, 0]);
-               
-               symbol.rankOrder = i;
-               symbol.bestX = 0;
-               symbol.bestHit = 1;
-               
-         });
+  x.domain([
+            d3.min(symbols, function(symbol) { return symbol.values[0][time];}),
+            d3.max(symbols, function(symbol) { return symbol.values[symbol.values.length - 1][time]; })
+            ]);
   
-         svg.append("path")
-         .attr("class", "area")
-         .attr("d", function(symbol) {
-               return d3.svg.area()
-               .x(function(d) { return x(d[time]); })
-               .y1(function(d) { return symbol.y(d[value]); })
-               .y0(height)
-               (symbol.values);
-               });
-         
-         svg.append("path")
-         .attr("class", "line")
-         .attr("d", function(symbol) {
-               return d3.svg.line()
-               .x(function(d) { return x(d[time]); })
-               .y(function(d) { return symbol.y(d[value]); })
-               (symbol.values);
-               });
-         
-         svg.append("text")
-         .attr("x", width - margin.right - 6)
-         .attr("y", 6)
-         .attr("fill","#000")
-         .style("text-anchor", "end")
-         .style("stroke","#fff")
-         .style("stroke-width","2")
-         .text(function(symbol) { return symbol.key; });
-         
-         svg.append("text")
-         .attr("x", width - margin.right - 6)
-         .attr("y", 6)
-         .attr("fill","#000")
-         .style("text-anchor", "end")
-         
-         .text(function(symbol) { return symbol.key; });
-         
-         
-         rwidth = d3.select("#results").node().scrollWidth - 20;
-         rX = d3.time.scale();
-         rX.domain([
-                    d3.min(symbols, function(symbol) { return symbol.values[0][time];}),
-                    d3.max(symbols, function(symbol) { return symbol.values[symbol.values.length - 1][time]; })
-                    ]);
-         rX.range([0,rwidth]);
-         
-         //Make Visual Query Area
   
-         var xAxis = d3.svg.axis().orient("top").scale(rX).tickSize(10).tickFormat(getFormat()).ticks(20);
-         
-         d3.select("#search")
-         .append("svg")
-         .attr("width", rwidth)
-         .attr("height","25")
-         .append("g")
-         .attr("transform","translate(0,25)")
-         .attr("class","xaxis")
-         .call(xAxis);
-         
-         d3.select("#search")
-         .append("canvas")
-         .attr("id","queryCanvas")
-         .attr("width",rwidth)
-         .attr("height",document.getElementById("search").clientHeight-25);
-         
-         d3.select("#searchUI")
-         .append("button")
-         .attr("onclick","search()")
-         .attr("class","searchbtn")
-         .text("")
-         .append("img")
-         .attr("src","imgs/search.png");
-         
-         d3.select("#searchUI")
-         .append("button")
-         .attr("onclick","resetQuery()")
-         .attr("id","clearBtn")
-         .text("")
-         .append("img")
-         .attr("src","imgs/clear.png");
-         
-         d3.select("#searchUI")
-         .append("button")
-         .attr("onclick","drawMode()")
-         .attr("id","drawBtn")
-         .text("")
-         .append("img")
-         .attr("src","imgs/draw-active.png");
-         
-         d3.select("#searchUI")
-         .append("button")
-         .attr("onclick","eraseMode()")
-         .attr("id","eraseBtn")
-         .text("")
-         .append("img")
-         .attr("src","imgs/erase.png");
-         
-         searchCanvas = document.getElementById("queryCanvas");
-         
-         var searchArea = document.getElementById("search");
-         searchArea.addEventListener("mousedown",mouseDown,false);
-         searchArea.addEventListener("mouseup",mouseUp,false);
-         searchArea.addEventListener("mousemove",mouseMove,false);
-         searchArea.addEventListener("mouseleave",mouseLeave,false);
-         
-         searchArea.addEventListener("touchstart",mouseDown,false);
-         searchArea.addEventListener("touchmove",mouseMove,false);
-         searchArea.addEventListener("touchend",mouseUp,false);
-         searchArea.addEventListener("touchleave",mouseLeave,false);
-         
-         bounds = searchCanvas.getBoundingClientRect();
-         makeVotes();
-         
-         
-         // prevent elastic scrolling
-         searchArea.addEventListener('touchmove',function(event){
-                                     event.preventDefault();
-                                     },false);  // end body:touchmove
-         
-         //Initialize query
-         query = new Array(searchCanvas.width+1);
-         sparseQuery = new Array();
-         for(var i = 0;i<query.length;i++){
-          query[i] = -1;
-         }
-         
-         rY = d3.scale.linear().domain([0,height]).range([searchCanvas.height,0]);
-         context = searchCanvas.getContext("2d");
-         resetQuery();
+  var svg = d3.select("#multiples").selectAll("svg")
+  .data(symbols)
+  .enter().append("svg")
+  .attr("width", width)
+  .attr("height", height + margin.top + margin.bottom)
+  .attr("id",function(symbol){ return "key"+symbol.key;})
+  .attr("ondblclick","transferQuery(event)")
+  .attr("ontouchstart","touchInit(event)")
+  .attr("ontouchend","touchTransfer(event)")
+  .append("g")
+  .attr("transform", "translate(" + 0  + "," + margin.top + ")")
+  .each(function(symbol,i) {
+        
+        symbol.y = d3.scale.linear()
+        .domain(d3.extent(symbol.values,function(d){return d[value];}))
+        .range([height, 0]);
+        
+        symbol.rankOrder = i;
+        symbol.bestX = 0;
+        symbol.bestHit = 1;
+        
+        });
+  
+  svg.append("path")
+  .attr("class", "area")
+  .attr("d", function(symbol) {
+        return d3.svg.area()
+        .x(function(d) { return x(d[time]); })
+        .y1(function(d) { return symbol.y(d[value]); })
+        .y0(height)
+        (symbol.values);
+        });
+  
+  svg.append("path")
+  .attr("class", "line")
+  .attr("d", function(symbol) {
+        return d3.svg.line()
+        .x(function(d) { return x(d[time]); })
+        .y(function(d) { return symbol.y(d[value]); })
+        (symbol.values);
+        });
+  
+  svg.append("text")
+  .attr("x", width - margin.right - 6)
+  .attr("y", 6)
+  .attr("fill","#000")
+  .style("text-anchor", "end")
+  .style("stroke","#fff")
+  .style("stroke-width","2")
+  .text(function(symbol) { return symbol.key; });
+  
+  svg.append("text")
+  .attr("x", width - margin.right - 6)
+  .attr("y", 6)
+  .attr("fill","#000")
+  .style("text-anchor", "end")
+  
+  .text(function(symbol) { return symbol.key; });
+  
+  
+  rwidth = d3.select("#results").node().scrollWidth - 20;
+  rX = d3.time.scale();
+  rX.domain([
+             d3.min(symbols, function(symbol) { return symbol.values[0][time];}),
+             d3.max(symbols, function(symbol) { return symbol.values[symbol.values.length - 1][time]; })
+             ]);
+  rX.range([0,rwidth]);
+  
+  //Make Visual Query Area
+  
+  var xAxis = d3.svg.axis().orient("top").scale(rX).tickSize(10).tickFormat(getFormat()).ticks(20);
+  
+  d3.select("#search")
+  .append("svg")
+  .attr("width", rwidth)
+  .attr("height","25")
+  .append("g")
+  .attr("transform","translate(0,25)")
+  .attr("class","xaxis")
+  .call(xAxis);
+  
+  d3.select("#search")
+  .append("canvas")
+  .attr("id","queryCanvas")
+  .attr("width",rwidth)
+  .attr("height",document.getElementById("search").clientHeight-25);
+  
+  d3.select("#searchUI")
+  .append("button")
+  .attr("onclick","search()")
+  .attr("class","searchbtn")
+  .text("")
+  .append("img")
+  .attr("src","imgs/search.png");
+  
+  d3.select("#searchUI")
+  .append("button")
+  .attr("onclick","resetQuery()")
+  .attr("id","clearBtn")
+  .text("")
+  .append("img")
+  .attr("src","imgs/clear.png");
+  
+  d3.select("#searchUI")
+  .append("button")
+  .attr("onclick","drawMode()")
+  .attr("id","drawBtn")
+  .text("")
+  .append("img")
+  .attr("src","imgs/draw-active.png");
+  
+  d3.select("#searchUI")
+  .append("button")
+  .attr("onclick","eraseMode()")
+  .attr("id","eraseBtn")
+  .text("")
+  .append("img")
+  .attr("src","imgs/erase.png");
+  
+  searchCanvas = document.getElementById("queryCanvas");
+  context = searchCanvas.getContext("2d");
+  
+  devicePixelRatio = window.devicePixelRatio || 1,
+  backingStoreRatio = context.webkitBackingStorePixelRatio ||
+  context.mozBackingStorePixelRatio ||
+  context.msBackingStorePixelRatio ||
+  context.oBackingStorePixelRatio ||
+  context.backingStorePixelRatio || 1,
+  ratio = devicePixelRatio / backingStoreRatio;
+  
+  
+  retinaFix();
+  
+  var searchArea = document.getElementById("search");
+  searchArea.addEventListener("mousedown",mouseDown,false);
+  searchArea.addEventListener("mouseup",mouseUp,false);
+  searchArea.addEventListener("mousemove",mouseMove,false);
+  searchArea.addEventListener("mouseleave",mouseLeave,false);
+  
+  searchArea.addEventListener("touchstart",mouseDown,false);
+  searchArea.addEventListener("touchmove",mouseMove,false);
+  searchArea.addEventListener("touchend",mouseUp,false);
+  searchArea.addEventListener("touchleave",mouseLeave,false);
+  
+  bounds = searchCanvas.getBoundingClientRect();
+  makeVotes();
+  
+  
+  // prevent elastic scrolling
+  searchArea.addEventListener('touchmove',function(event){
+                              event.preventDefault();
+                              },false);  // end body:touchmove
+  
+  //Initialize query
+  query = new Array(searchCanvas.width+1);
+  sparseQuery = new Array();
+  for(var i = 0;i<query.length;i++){
+    query[i] = -1;
+  }
+  
+  rY = d3.scale.linear().domain([0,height]).range([cHeight,0]);
+  resetQuery();
+  
+  d3.select("#loading").attr("style","visibility:hidden;");
 }
 
 
@@ -278,12 +292,32 @@ function resize(){
   width = document.getElementById("multiples").scrollWidth;
   height = 30 - margin.top - margin.bottom;
   rwidth = d3.select("#results").node().scrollWidth - 20;
+  
+  searchCanvas.width = rwidth;
+  searchCanvas.height = document.getElementById("search").clientHeight-25;
+  
+  retinaFix();
   bounds = searchCanvas.getBoundingClientRect();
   
   
-  rY = d3.scale.linear().domain([0,height]).range([searchCanvas.height,0]);
+  rY = d3.scale.linear().domain([0,height]).range([cHeight,0]);
+  resetQuery();
   makeVotes();
   
+}
+
+function retinaFix(){
+  //Deal with pesky retina displays
+  if(devicePixelRatio !== backingStoreRatio){
+    var canvasWidth = searchCanvas.width;
+    var canvasHeight = searchCanvas.height;
+    searchCanvas.width = canvasWidth * ratio;
+    searchCanvas.height = canvasHeight * ratio;
+    searchCanvas.style.width = canvasWidth + "px";
+    searchCanvas.style.height = canvasHeight + "px";
+    context.scale(ratio,ratio);
+    cHeight = canvasHeight;
+  }
 }
 
 function type(d) {
@@ -297,7 +331,7 @@ function type(d) {
 
 
 function search(){
-  document.body.style.cursor = "wait";
+  d3.select("#loading").attr("style","visiblity: visible;");
   queryRange = 0;
   queryMin = -1;
   queryMax = -1;
@@ -326,12 +360,11 @@ function search(){
   var end = new Date().getTime();
   var queryDuration = end-start;
   console.log("Query of size "+queryRange+" completed in "+queryDuration+" msecs");
-  
+  d3.select("#loading").attr("style","visibility:hidden;");
   fromDiffToRank();
   hitColorScale.domain([d3.select("#multiples").select("svg:last-child").datum().bestHit,d3.select("#multiples").select("svg").datum().bestHit]);
   updateColors();
   result(document.getElementById("n").value);
-  document.body.style.cursor = "default";
 }
 
 function inRangeResults(symbol){
@@ -609,7 +642,7 @@ function makeVotes(){
   //Creates our array of votes for Hough voting
   votes = new Array(Math.floor(searchCanvas.width*voteScale));
   for(var i = 0;i<votes.length;i++){
-    votes[i] = new Array(Math.floor((searchCanvas.height + Math.floor((2*voteBuffer)*searchCanvas.height))*voteScale));
+    votes[i] = new Array(Math.floor((cHeight + Math.floor((2*voteBuffer)*cHeight))*voteScale));
   }
 }
 
@@ -674,7 +707,7 @@ function houghTransform(symbol){
           curVal = signal[i][value];
         }
         hindex = Math.floor((testX + ((queryRange/2.0)-(j-queryMin)))*voteScale);
-        vindex = Math.floor((((searchCanvas.height/2.0) - query[j]) + rY(symbol.y(curVal))+(voteBuffer*searchCanvas.height))*yVoteScale);
+        vindex = Math.floor((((cHeight/2.0) - query[j]) + rY(symbol.y(curVal))+(voteBuffer*cHeight))*yVoteScale);
         if(hindex>=0 && hindex<votes.length && vindex>0 && vindex<(votes[0].length)){
           votes[hindex][vindex]++;
           
@@ -821,14 +854,14 @@ function minDiff(symbol){
 function mouseDown(m_event){
   if(!drawing){
     oldX = Math.round(m_event.pageX - bounds.left);
-    oldY = Math.floor(searchCanvas.height - (bounds.bottom - m_event.pageY));
+    oldY = Math.floor(cHeight - (bounds.bottom - m_event.pageY));
   }
   drawing = true;
 }
 
 function mouseMove(m_event){
   var mx = Math.floor(m_event.pageX - bounds.left);
-  var my = Math.round(searchCanvas.height - (bounds.bottom - m_event.pageY));// -bounds.bottom;
+  var my = Math.round(cHeight - (bounds.bottom - m_event.pageY));// -bounds.bottom;
   
   if(drawing){
     if(mx>searchCanvas.width){
@@ -840,8 +873,8 @@ function mouseMove(m_event){
     if(my<0){
       my = 0;
     }
-    else if(my>searchCanvas.height){
-      my = searchCanvas.height;
+    else if(my>cHeight){
+      my = cHeight;
     }
     if(dMode==0){
       drawLine(mx,my);
@@ -857,16 +890,16 @@ function mouseMove(m_event){
 
 
 function drawLine(mx,my){
-  console.log(oldX+","+oldY+" "+mx+","+my);
-  var qpoint =  {x: mx, y: searchCanvas.height-my};
+  //console.log(oldX+","+oldY+" "+mx+","+my);
+  var qpoint =  {x: mx, y: cHeight-my};
   sparseQuery.push(qpoint);
   
   context.fillStyle = "#333";
   context.beginPath();
-  context.moveTo(oldX,searchCanvas.height);
+  context.moveTo(oldX,cHeight);
   context.lineTo(oldX,oldY);
   context.lineTo(mx,my);
-  context.lineTo(mx,searchCanvas.height);
+  context.lineTo(mx,cHeight);
   context.closePath();
   context.fill();
   
@@ -882,20 +915,20 @@ function drawLine(mx,my){
   if(mx>oldX){
     slope = (my-oldY)/(mx-oldX);
     for(var i = oldX;i<mx;i++){
-      query[i] = searchCanvas.height-(((i-oldX)*slope)+oldY);
+      query[i] = cHeight-(((i-oldX)*slope)+oldY);
       //  query[i] = searchCanvas.height - my;
-      //  console.log("Set query["+i+"]");
+      //console.log("Set query["+i+"]");
     }
   }
   else if(mx<oldX){
     slope = (oldY-my)/(oldX-mx);
     for(var i = mx;i<oldX;i++){
-      query[i] = searchCanvas.height-(((i-mx)*slope)+my);
+      query[i] = cHeight-(((i-mx)*slope)+my);
     }
     //  console.log("Set query["+i+"]");
   }
   else{
-    query[mx] = searchCanvas.height-my;
+    query[mx] = cHeight-my;
     //  console.log("Set query["+mx+"]");
   }
   
@@ -906,18 +939,18 @@ function eraseLine(mx,my){
   context.fillStyle = "#fff";
   context.beginPath();
   context.moveTo(oldX,0);
-  context.lineTo(oldX,searchCanvas.height);
-  context.lineTo(mx,searchCanvas.height);
+  context.lineTo(oldX,cHeight);
+  context.lineTo(mx,cHeight);
   context.lineTo(mx,0);
   context.closePath();
   context.fill();
   
   context.fillStyle = "#ff0000";
   context.beginPath();
-  context.moveTo(oldX,searchCanvas.height);
-  context.lineTo(oldX,searchCanvas.height-nanHeight);
-  context.lineTo(mx,searchCanvas.height-nanHeight);
-  context.lineTo(mx,searchCanvas.height);
+  context.moveTo(oldX,cHeight);
+  context.lineTo(oldX,cHeight-nanHeight);
+  context.lineTo(mx,cHeight-nanHeight);
+  context.lineTo(mx,cHeight);
   context.closePath();
   context.fill();
   
@@ -950,7 +983,7 @@ function mouseLeave(m_event){
   drawing = false;
 }
 function resetQuery(){
-  context.clearRect(0,0,searchCanvas.width,searchCanvas.height);
+  context.clearRect(0,0,searchCanvas.width,cHeight);
   for(var i = 0;i<query.length;i++){
     query[i] = -1;
   }
@@ -958,10 +991,10 @@ function resetQuery(){
   
   context.fillStyle = "#ff0000";
   context.beginPath();
-  context.moveTo(0,searchCanvas.height);
-  context.lineTo(0,searchCanvas.height-nanHeight);
-  context.lineTo(searchCanvas.width,searchCanvas.height-nanHeight);
-  context.lineTo(searchCanvas.width,searchCanvas.height);
+  context.moveTo(0,cHeight);
+  context.lineTo(0,cHeight-nanHeight);
+  context.lineTo(searchCanvas.width,cHeight-nanHeight);
+  context.lineTo(searchCanvas.width,cHeight);
   context.closePath();
   context.fill();
   
@@ -1020,15 +1053,15 @@ function drawQuery(symbol){
   for(var i = 0;i<symbol.values.length-1;i++){
     curX = Math.floor(rX(symbol.values[i][time]));
     nextX = Math.floor(rX(symbol.values[i+1][time]));
-    curY = searchCanvas.height - rY(symbol.y(symbol.values[i][value]));
-    nextY = searchCanvas.height- rY(symbol.y(symbol.values[i+1][value]));
+    curY = cHeight - rY(symbol.y(symbol.values[i][value]));
+    nextY = cHeight- rY(symbol.y(symbol.values[i+1][value]));
     
     context.fillStyle = "#333";
     context.beginPath();
-    context.moveTo(curX,searchCanvas.height);
+    context.moveTo(curX,cHeight);
     context.lineTo(curX,curY);
     context.lineTo(nextX,nextY);
-    context.lineTo(nextX,searchCanvas.height);
+    context.lineTo(nextX,cHeight);
     context.closePath();
     context.fill();
     
@@ -1043,13 +1076,9 @@ function drawQuery(symbol){
     
     slope = (nextY-curY)/(nextX-curX);
     for(var j = curX;j<nextX;j++){
-      query[j] = searchCanvas.height - (curY + (slope*(j-curX)));
+      query[j] = cHeight - (curY + (slope*(j-curX)));
     }
-    
-    
   }
-  
-  
 }
 
 function setInvariants(){

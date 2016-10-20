@@ -86,11 +86,6 @@ svg .xaxis text{
   stroke-width: 0.5px;
 }
 
-
-
-
-
-
 #search{
 
 	background: #eee;
@@ -115,7 +110,6 @@ svg .xaxis text{
 	background: #fff;
 	margin-left: 10px;
 	margin-right: 10px;
-  min-height: 100px;
 }
 
 #searchUI{
@@ -144,6 +138,7 @@ svg .xaxis text{
 	height: 80%;
 	width: 10%;
 }
+
 #searchUI button img{
 
 	height: 80%;
@@ -152,7 +147,15 @@ svg .xaxis text{
 .searchTable{
 	margin-left:10px
 }
+
 .searchTable th,td{
 	border-collapse: collapse;
 	border: 1px solid buttonface;
+}
+
+#loading{
+  position: absolute;
+  left: 50%;
+  top: -125%;
+  height: 100%;
 }
