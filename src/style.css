@@ -3,6 +3,11 @@ body {
   margin: 0;
 }
 
+#info {
+  left: 25%;
+  text-align: center;
+  background: #eee;
+}
 
 svg .xaxis{
 	font-size: 10px;

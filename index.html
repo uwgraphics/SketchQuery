@@ -10,6 +10,9 @@
 </head>
 
 <body onresize="resize()">
+<div id="info">
+    Prototype sketch-based visual query system for our VAST 2016 <a href="http://graphics.cs.wisc.edu/Papers/2016/CG16/" target="_blank" >paper</a>. Documentation available <a href="https://github.com/uwgraphics/SketchQuery" target="_blank">here</a>.
+</div>
 <div id="multiples"></div>
 
 <div id="results"></div>
@@ -19,6 +22,7 @@
 <table class="searchTable">
 <tr><td>Find the top <input type="number" defaultvalue="5" id="n" max="10" min="1"  name="n" step="1" value="5" /> series. Show results <select id="resultMode" name="resultMode"><option value="0">in seperate graphs</option><option value="1">in the same graph</option></select>.</td><td>X Position</td><td>Y Position</td><td>Noise</td><td>Amplitude</td><td>Warp</td></tr>
 <tr><td>Use <select id="queryMode" onchange="setInvariants()" name="queryMode"><option value="0">MSE (value matching)</option><option value="1">Hough (pattern matching)</option><option value="2">DTW (time warped value matching)</option></select>, ignoring: </td><td><input type="checkbox" name="xpos" value="XPos" id="XPos" /></td><td><input type="checkbox" name="ypos" value="YPos" id="YPos" disabled="true" /></td><td><input type="checkbox" name="noise" value="Noise" id="Noise" /></td><td><input type="checkbox" name="amp" value="Amp" id="Amp" disabled="true"/></td><td><input type="checkbox" name="warp" value="Warp" id="Warp" disabled="true" /></td></tr>
+
 </table>
 
 </div>

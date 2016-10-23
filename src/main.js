@@ -182,7 +182,8 @@ function doneLoad(rawData){
   .attr("class","searchbtn")
   .text("")
   .append("img")
-  .attr("src","imgs/search.png");
+  .attr("src","imgs/search.png")
+  .attr("title","Run Query");
   
   d3.select("#searchUI")
   .append("button")
@@ -190,7 +191,8 @@ function doneLoad(rawData){
   .attr("id","clearBtn")
   .text("")
   .append("img")
-  .attr("src","imgs/clear.png");
+  .attr("src","imgs/clear.png")
+  .attr("title","Clear Query");
   
   d3.select("#searchUI")
   .append("button")
@@ -198,7 +200,8 @@ function doneLoad(rawData){
   .attr("id","drawBtn")
   .text("")
   .append("img")
-  .attr("src","imgs/draw-active.png");
+  .attr("src","imgs/draw-active.png")
+  .attr("title","Draw");
   
   d3.select("#searchUI")
   .append("button")
@@ -206,7 +209,8 @@ function doneLoad(rawData){
   .attr("id","eraseBtn")
   .text("")
   .append("img")
-  .attr("src","imgs/erase.png");
+  .attr("src","imgs/erase.png")
+  .attr("title","Erase");
   
   searchCanvas = document.getElementById("queryCanvas");
   context = searchCanvas.getContext("2d");
@@ -219,8 +223,8 @@ function doneLoad(rawData){
   context.backingStorePixelRatio || 1,
   ratio = devicePixelRatio / backingStoreRatio;
   
-  
   retinaFix();
+  cHeight = searchCanvas.height;
   
   var searchArea = document.getElementById("search");
   searchArea.addEventListener("mousedown",mouseDown,false);
@@ -249,10 +253,8 @@ function doneLoad(rawData){
     query[i] = -1;
   }
   
-  rY = d3.scale.linear().domain([0,height]).range([cHeight,0]);
-  resetQuery();
-  
   d3.select("#loading").attr("style","visibility:hidden;");
+  resize();
 }
 
 
@@ -295,11 +297,10 @@ function resize(){
   
   searchCanvas.width = rwidth;
   searchCanvas.height = document.getElementById("search").clientHeight-25;
-  
+  cHeight = searchCanvas.height;
   retinaFix();
+  
   bounds = searchCanvas.getBoundingClientRect();
-  
-  
   rY = d3.scale.linear().domain([0,height]).range([cHeight,0]);
   resetQuery();
   makeVotes();
@@ -316,8 +317,8 @@ function retinaFix(){
     searchCanvas.style.width = canvasWidth + "px";
     searchCanvas.style.height = canvasHeight + "px";
     context.scale(ratio,ratio);
-    cHeight = canvasHeight;
   }
+  
 }
 
 function type(d) {
