@@ -1,6 +1,8 @@
 # SketchQuery
 A information associated with our [paper](paper/VAST2016.pdf) for [VAST 2016](http://ieeevis.org/),  [Semantics of Sketch: A Visual Query System for Time Series Data](http://graphics.cs.wisc.edu/Papers/2016/CG16/).
 
+A client-side version is running [here](http://uwgraphics.github.io/SketchQuery/).
+
 Data from our qualitative study is in the [Evaluation](evaluation) folder.
 
 The following information is for our tool, which allows users to sketch a query on a height field, establish invariants (properties of the sketch or data they find unimportant) and then query a set of time series data.
@@ -102,6 +104,6 @@ E. Datasets
 -----------
 We have included a number of default datasets on github pages. Somes ones to try:
 
-* [Google n grams](uwgraphics.github.io/SketchQuery) (default): The top 1000 most popular words in the google books corpus, with frequency information from 1800 onward.
-* [Stocks](uwgraphics.github.io/SketchQuery/?data=stocks2&time=date&value=price&name=symbol): Sample stock information for a period of one year, August 2009-2010.
+* [Google n grams](http://uwgraphics.github.io/SketchQuery) (default): The top 1000 most popular words in the google books corpus, with frequency information from 1800 onward.
+* [Stocks](http://uwgraphics.github.io/SketchQuery/?data=stocks2&time=date&value=price&name=symbol): Sample stock information for a period of one year, August 2009-2010.
 * [U.S. Government Agencies](http://uwgraphics.github.io/SketchQuery/?data=budget&name=agency&time=year&value=budget): The yearly budget of every agency of the U.S. government, 1976-2020(projected).
